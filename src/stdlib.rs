@@ -14,6 +14,7 @@ impl StdLib {
         feature = "lua52",
         feature = "luau"
     ))]
+    #[cfg(not(feature = "factorio"))]
     pub const COROUTINE: StdLib = StdLib(1);
 
     /// [`table`](https://www.lua.org/manual/5.4/manual.html#6.6) library
@@ -21,10 +22,12 @@ impl StdLib {
 
     /// [`io`](https://www.lua.org/manual/5.4/manual.html#6.8) library
     #[cfg(not(feature = "luau"))]
+    #[cfg(not(feature = "factorio"))]
     #[cfg_attr(docsrs, doc(cfg(not(feature = "luau"))))]
     pub const IO: StdLib = StdLib(1 << 2);
 
     /// [`os`](https://www.lua.org/manual/5.4/manual.html#6.9) library
+    #[cfg(not(feature = "factorio"))]
     pub const OS: StdLib = StdLib(1 << 3);
 
     /// [`string`](https://www.lua.org/manual/5.4/manual.html#6.4) library
@@ -46,6 +49,7 @@ impl StdLib {
     pub const MATH: StdLib = StdLib(1 << 7);
 
     /// [`package`](https://www.lua.org/manual/5.4/manual.html#6.3) library
+    #[cfg(not(feature = "factorio"))]
     pub const PACKAGE: StdLib = StdLib(1 << 8);
 
     /// [`buffer`](https://luau-lang.org/library#buffer-library) library
@@ -65,10 +69,15 @@ impl StdLib {
     /// Requires `feature = "luajit"`
     #[cfg(any(feature = "luajit", doc))]
     #[cfg_attr(docsrs, doc(cfg(feature = "luajit")))]
-    pub const FFI: StdLib = StdLib(1 << 30);
+    pub const FFI: StdLib = StdLib(1 << 29);
 
     /// (**unsafe**) [`debug`](https://www.lua.org/manual/5.4/manual.html#6.10) library
+    #[cfg(not(feature = "factorio"))]
     pub const DEBUG: StdLib = StdLib(1 << 31);
+    #[cfg(feature = "factorio")]
+    pub const PARTIALDEBUG: StdLib = StdLib(1 << 30);
+    #[cfg(feature = "factorio")]
+    pub const FULLDEBUG: StdLib = StdLib(1 << 31);
 
     /// No libraries
     pub const NONE: StdLib = StdLib(0);
@@ -76,7 +85,10 @@ impl StdLib {
     pub const ALL: StdLib = StdLib(u32::MAX);
     /// The safe subset of the standard libraries
     #[cfg(not(feature = "luau"))]
-    pub const ALL_SAFE: StdLib = StdLib((1 << 30) - 1);
+    #[cfg(not(feature = "factorio"))]
+    pub const ALL_SAFE: StdLib = StdLib((1 << 29) - 1);
+    #[cfg(feature = "factorio")]
+    pub const ALL_SAFE: StdLib = StdLib((1 << 31) - 1);
     #[cfg(feature = "luau")]
     pub const ALL_SAFE: StdLib = StdLib(u32::MAX);
 

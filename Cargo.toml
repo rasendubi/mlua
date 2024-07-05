@@ -26,6 +26,7 @@ members = [
 ]
 
 [features]
+factorio = ["lua52", "ffi/factorio"]
 lua54 = ["ffi/lua54"]
 lua53 = ["ffi/lua53"]
 lua52 = ["ffi/lua52"]

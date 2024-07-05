@@ -255,6 +255,7 @@ impl RawLua {
         let is_safe = (*self.extra.get()).safe;
 
         #[cfg(not(feature = "luau"))]
+        #[cfg(not(feature = "factorio"))]
         if is_safe && libs.contains(StdLib::DEBUG) {
             return Err(Error::SafetyError(
                 "the unsafe `debug` module can't be loaded in safe mode".to_string(),
@@ -271,6 +272,7 @@ impl RawLua {
 
         // If `package` library loaded into a safe lua state then disable C modules
         let curr_libs = (*self.extra.get()).libs;
+        #[cfg(not(feature = "factorio"))]
         if is_safe && (curr_libs ^ (curr_libs | libs)).contains(StdLib::PACKAGE) {
             mlua_expect!(self.lua().disable_c_modules(), "Error during disabling C modules");
         }
@@ -1303,6 +1305,7 @@ unsafe fn load_std_libs(state: *mut ffi::lua_State, libs: StdLib) -> Result<()> 
     let _gc_guard = GcGuard::new(state);
 
     #[cfg(any(feature = "lua54", feature = "lua53", feature = "lua52", feature = "luau"))]
+    #[cfg(not(feature = "factorio"))]
     {
         if libs.contains(StdLib::COROUTINE) {
             requiref(state, ffi::LUA_COLIBNAME, ffi::luaopen_coroutine, 1)?;
@@ -1316,11 +1319,13 @@ unsafe fn load_std_libs(state: *mut ffi::lua_State, libs: StdLib) -> Result<()> 
     }
 
     #[cfg(not(feature = "luau"))]
+    #[cfg(not(feature = "factorio"))]
     if libs.contains(StdLib::IO) {
         requiref(state, ffi::LUA_IOLIBNAME, ffi::luaopen_io, 1)?;
         ffi::lua_pop(state, 1);
     }
 
+    #[cfg(not(feature = "factorio"))]
     if libs.contains(StdLib::OS) {
         requiref(state, ffi::LUA_OSLIBNAME, ffi::luaopen_os, 1)?;
         ffi::lua_pop(state, 1);
@@ -1372,12 +1377,22 @@ unsafe fn load_std_libs(state: *mut ffi::lua_State, libs: StdLib) -> Result<()> 
         ffi::lua_pop(state, 1);
     }
 
+    #[cfg(not(feature = "factorio"))]
     if libs.contains(StdLib::DEBUG) {
         requiref(state, ffi::LUA_DBLIBNAME, ffi::luaopen_debug, 1)?;
         ffi::lua_pop(state, 1);
     }
+    #[cfg(feature = "factorio")]
+    if libs.contains(StdLib::FULLDEBUG) {
+        requiref(state, ffi::LUA_DBLIBNAME, ffi::luaopen_fulldebug, 1)?;
+        ffi::lua_pop(state, 1);
+    } else if libs.contains(StdLib::PARTIALDEBUG) {
+        requiref(state, ffi::LUA_DBLIBNAME, ffi::luaopen_partialdebug, 1)?;
+        ffi::lua_pop(state, 1);
+    }
 
     #[cfg(not(feature = "luau"))]
+    #[cfg(not(feature = "factorio"))]
     if libs.contains(StdLib::PACKAGE) {
         requiref(state, ffi::LUA_LOADLIBNAME, ffi::luaopen_package, 1)?;
         ffi::lua_pop(state, 1);

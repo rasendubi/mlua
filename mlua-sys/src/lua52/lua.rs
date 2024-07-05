@@ -125,6 +125,10 @@ extern "C-unwind" {
     // Access functions (stack -> C)
     //
     pub fn lua_isnumber(L: *mut lua_State, idx: c_int) -> c_int;
+    #[cfg_attr(
+        feature = "factorio",
+        link_name = "lua_isstringornumberconvertabletostring"
+    )]
     pub fn lua_isstring(L: *mut lua_State, idx: c_int) -> c_int;
     pub fn lua_iscfunction(L: *mut lua_State, idx: c_int) -> c_int;
     pub fn lua_isuserdata(L: *mut lua_State, idx: c_int) -> c_int;

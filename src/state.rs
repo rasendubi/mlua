@@ -201,6 +201,7 @@ impl Lua {
     /// See [`StdLib`] documentation for a list of unsafe modules that cannot be loaded.
     pub fn new_with(libs: StdLib, options: LuaOptions) -> Result<Lua> {
         #[cfg(not(feature = "luau"))]
+        #[cfg(not(feature = "factorio"))]
         if libs.contains(StdLib::DEBUG) {
             return Err(Error::SafetyError(
                 "The unsafe `debug` module can't be loaded using safe `new_with`".to_string(),
@@ -215,6 +216,7 @@ impl Lua {
 
         let lua = unsafe { Self::inner_new(libs, options) };
 
+        #[cfg(not(feature = "factorio"))]
         if libs.contains(StdLib::PACKAGE) {
             mlua_expect!(lua.disable_c_modules(), "Error disabling C modules");
         }
